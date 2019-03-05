@@ -18,7 +18,7 @@
 
     <!-- JAVA -->
     <Message Importance="High" Text="Ensuring JAVA is available" />
-    <Exec Command="java --version" />
+    <Exec Command="java -version" />
     <Message Importance="High" Text="JAVA is available on the PATH" />
 
     <!-- package.json -->
