@@ -11,7 +11,7 @@
 
   <!-- Running prerequisites -->
 
-  <Target Name="EnsurePrerequisites" BeforeTargets="EnsureNodeJSRestored">
+  <Target Name="EnsurePrerequisites" Condition="'$(EnforcePrerequisites)' == 'True'" BeforeTargets="EnsureNodeJSRestored">
     <PropertyGroup>
       <_PackageJson>$(MSBuildProjectDirectory)\package.json</_PackageJson>
     </PropertyGroup>
