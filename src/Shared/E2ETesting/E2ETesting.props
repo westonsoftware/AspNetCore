@@ -2,6 +2,8 @@
   <PropertyGroup>
     <_DefaultProjectFilter>$(MSBuildProjectDirectory)\..\..</_DefaultProjectFilter>
     <DefaultItemExcludes>$(DefaultItemExcludes);node_modules\**</DefaultItemExcludes>
+    <EnforcePrerequisites Condition="'$(EnforcePrerequisites)' == '' and '$(CI)' != 'true' and '$(OS)' == 'Windows_NT'">True</EnforcePrerequisites>
+
     <!-- WebDriver is not strong-named, so this test project cannot be strong named either. -->
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
