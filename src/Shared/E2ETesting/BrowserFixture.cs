@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
+using System.Linq;
+using System.Reflection;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.E2ETesting
         {
             DiagnosticsMessageSink = diagnosticsMessageSink;
 
-            if (!HostSupportsBrowserAutomation)
+            if (!IsHostAutomationSupported())
             {
                 DiagnosticsMessageSink.OnMessage(new DiagnosticMessage("Host does not support browser automation."));
                 return;
@@ -41,20 +41,10 @@ namespace Microsoft.AspNetCore.E2ETesting
                 DiagnosticsMessageSink.OnMessage(new DiagnosticMessage($"Set {nameof(ChromeOptions)}.{nameof(opts.BinaryLocation)} to {binaryLocation}"));
             }
 
-            try
-            {
-                var driver = new RemoteWebDriver(SeleniumStandaloneServer.Instance.Uri, opts);
-                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
-                Browser = driver;
-                Logs = new RemoteLogs(driver);
-            }
-            catch (WebDriverException ex)
-            {
-                var message =
-                    "Failed to connect to the web driver. Please see the readme and follow the instructions to install selenium." +
-                    "Remember to start the web driver with `selenium-standalone start` before running the end-to-end tests.";
-                throw new InvalidOperationException(message, ex);
-            }
+            var driver = new RemoteWebDriver(SeleniumStandaloneServer.Instance.Uri, opts);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(1);
+            Browser = driver;
+            Logs = new RemoteLogs(driver);
         }
 
         public IWebDriver Browser { get; }
@@ -63,27 +53,28 @@ namespace Microsoft.AspNetCore.E2ETesting
 
         public IMessageSink DiagnosticsMessageSink { get; }
 
-        public static bool HostSupportsBrowserAutomation => string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ASPNETCORE_BROWSER_AUTOMATION_DISABLED")) &&
-            (IsAppVeyor || (IsVSTS && RuntimeInformation.OSDescription.Contains("Microsoft Windows")) || OSSupportsEdge());
-
-        private static bool IsAppVeyor =>
-            Environment.GetEnvironmentVariables().Contains("APPVEYOR");
-
-        private static bool IsVSTS =>
-            Environment.GetEnvironmentVariables().Contains("TF_BUILD");
-
-        private static int GetWindowsVersion()
+        public static bool IsHostAutomationSupported()
         {
-            var osDescription = RuntimeInformation.OSDescription;
-            var windowsVersion = Regex.Match(osDescription, "^Microsoft Windows (\\d+)\\..*");
-            return windowsVersion.Success ? int.Parse(windowsVersion.Groups[1].Value) : -1;
-        }
+            // We emit an assemblymetadata attribute that reflects the value of SeleniumE2ETestsSupported at build
+            // time and we use that to conditionally skip Selenium tests parts.
+            var attribute = typeof(BrowserFixture).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                .SingleOrDefault(a => a.Key == "Microsoft.AspNetCore.Testing.Selenium.Supported");
+            var attributeValue = attribute != null ? bool.Parse(attribute.Value) : false;
 
-        private static bool OSSupportsEdge()
-        {
-            var windowsVersion = GetWindowsVersion();
-            return (windowsVersion >= 10 && windowsVersion < 2000)
-                || (windowsVersion >= 2016);
+            // The environment variable below can be set up before running the tests so as to override the default
+            // value provided in the attribute.
+            var environmentOverride = Environment
+                .GetEnvironmentVariable("MICROSOFT_ASPNETCORE_TESTING_SELENIUM_SUPPORTED");
+            var environmentOverrideValue = !string.IsNullOrWhiteSpace(environmentOverride) ? bool.Parse(attribute.Value) : false;
+
+            if (environmentOverride != null)
+            {
+                return environmentOverrideValue;
+            }
+            else
+            {
+                return attributeValue;
+            }
         }
 
         public void Dispose()
