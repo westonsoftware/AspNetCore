@@ -27,10 +27,6 @@ Move-Item "$tempDir/jdk/jdk-${jdkVersion}" $env:JAVA_HOME
 Write-Host "Done installing JDK to $env:JAVA_HOME"
 
 if (-not $env:Path.Contains($env:JAVA_HOME)) {
-  Write-Host "Update PATH to include JAVA";
-  $path = "$env:JAVA_HOME\bin;$env:Path";
-  Get-ChildItem $env:JAVA_HOME
-  Get-ChildItem "$env:JAVA_HOME\bin"
-  [System.Environment]::SetEnvironmentVariable("PATH", $path, "User");
-  Write-Host "HOST = $env:Path"
+  Write-Host "##vso[task.prependpath]$env:JAVA_HOME\bin";
+  Write-Host "PATH = $env:Path"
 }
