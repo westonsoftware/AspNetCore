@@ -28,7 +28,7 @@ Write-Host "Done installing JDK to $env:JAVA_HOME"
 
 if(-not $env:Path.Contains($env:JAVA_HOME)){
     Write-Host "Update PATH to include JAVA";
-    $path = "$env:JAVA_HOME;$env:Path";
+    $path = "$env:JAVA_HOME\bin;$env:Path";
     [System.Environment]::SetEnvironmentVariable("PATH", $path, "User");
 }
 
