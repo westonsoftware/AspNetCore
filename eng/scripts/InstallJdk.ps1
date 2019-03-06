@@ -1,8 +1,8 @@
 
 param(
-    [Parameter(Mandatory = $true)]
-    $JdkVersion
-    )
+  [Parameter(Mandatory = $true)]
+  $JdkVersion
+)
 
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue' # Workaround PowerShell/PowerShell#2138
@@ -10,7 +10,7 @@ $ProgressPreference = 'SilentlyContinue' # Workaround PowerShell/PowerShell#2138
 Set-StrictMode -Version 1
 
 if (-not $env:JAVA_HOME) {
-    throw 'You must set the JAVA_HOME environment variable to the destination of the JDK.'
+  throw 'You must set the JAVA_HOME environment variable to the destination of the JDK.'
 }
 
 $repoRoot = Resolve-Path "$PSScriptRoot/../.."
@@ -26,10 +26,11 @@ Write-Host "Installing JDK to $env:JAVA_HOME"
 Move-Item "$tempDir/jdk/jdk-${jdkVersion}" $env:JAVA_HOME
 Write-Host "Done installing JDK to $env:JAVA_HOME"
 
-if(-not $env:Path.Contains($env:JAVA_HOME)){
-    Write-Host "Update PATH to include JAVA";
-    $path = "$env:JAVA_HOME\bin;$env:Path";
-    [System.Environment]::SetEnvironmentVariable("PATH", $path, "User");
+if (-not $env:Path.Contains($env:JAVA_HOME)) {
+  Write-Host "Update PATH to include JAVA";
+  $path = "$env:JAVA_HOME\bin;$env:Path";
+  Get-ChildItem $env:JAVA_HOME
+  Get-ChildItem "$env:JAVA_HOME\bin"
+  [System.Environment]::SetEnvironmentVariable("PATH", $path, "User");
+  Write-Host "HOST = $env:Path"
 }
-
-
