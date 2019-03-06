@@ -56,7 +56,7 @@ namespace Templates.Test.SpaTemplateTest
             {
                 aspNetProcess.AssertStatusCode("/", HttpStatusCode.OK, "text/html");
 
-                if (BrowserFixture.HostSupportsBrowserAutomation)
+                if (BrowserFixture.IsHostAutomationSupported())
                 {
                     aspNetProcess.VisitInBrowser(Browser);
                     TestBasicNavigation();

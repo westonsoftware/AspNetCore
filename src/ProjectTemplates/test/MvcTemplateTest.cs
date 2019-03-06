@@ -18,7 +18,7 @@ namespace Templates.Test
 
         [Theory]
         [InlineData(null)]
-        //[InlineData("F#", Skip = "https://github.com/aspnet/Templating/issues/673")]
+        [InlineData("F#", Skip = "https://github.com/aspnet/Templating/issues/673")]
         private void MvcTemplate_NoAuthImpl(string languageOverride)
         {
             Project.RunDotNetNew("mvc", language: languageOverride);

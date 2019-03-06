@@ -67,7 +67,7 @@
       </ItemGroup>
     </Target>
 
-  <Target Name="_AddMetadataAttributes" BeforeTargets="BeforeCompile" DependsOnTargets="_ResolveTestProjectReferences">
+  <Target Name="_AddTestProjectMetadataAttributes" BeforeTargets="BeforeCompile" DependsOnTargets="_ResolveTestProjectReferences">
     <ItemGroup>
       <_ContentRootMetadata
         Condition="'%(_ContentRootProjectReferences.Identity)' != ''"
@@ -84,6 +84,20 @@
         Include="System.Reflection.AssemblyMetadataAttribute">
         <_Parameter1>TestAssemblyApplication[%(_ContentRootMetadata.AssemblyName)]</_Parameter1>
         <_Parameter2>%(_ContentRootMetadata.ContentRootPath)</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_AddSeleniumSupportedMetadataAttribute" BeforeTargets="BeforeCompile">
+    <PropertyGroup>
+      <_SeleniumE2ETestsSupportedAttributeValue>false</_SeleniumE2ETestsSupportedAttributeValue>
+      <_SeleniumE2ETestsSupportedAttributeValue Condition="'$(SeleniumE2ETestsSupported)' == 'true'">true</_SeleniumE2ETestsSupportedAttributeValue>
+    </PropertyGroup>
+    <ItemGroup>
+      <AssemblyAttribute
+        Include="System.Reflection.AssemblyMetadataAttribute">
+        <_Parameter1>Microsoft.AspNetCore.Testing.Selenium.Supported</_Parameter1>
+        <_Parameter2>$(_SeleniumE2ETestsSupportedAttributeValue)</_Parameter2>
       </AssemblyAttribute>
     </ItemGroup>
   </Target>
