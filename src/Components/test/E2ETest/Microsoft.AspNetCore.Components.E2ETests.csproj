@@ -5,6 +5,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TestGroupName>Components.E2ETests</TestGroupName>
 
     <!--
       Temporarily disabled until this runs on macOS
