@@ -2,7 +2,8 @@
   <PropertyGroup>
     <_DefaultProjectFilter>$(MSBuildProjectDirectory)\..\..</_DefaultProjectFilter>
     <DefaultItemExcludes>$(DefaultItemExcludes);node_modules\**</DefaultItemExcludes>
-    <EnforcePrerequisites Condition="'$(EnforcePrerequisites)' == '' and '$(CI)' != 'true' and '$(OS)' == 'Windows_NT'">True</EnforcePrerequisites>
+    <SeleniumE2ETestsSupported Condition="'$(SeleniumE2ETestsSupported)' == '' and '$(TargetArchitecture)' != 'arm' and '$(OS)' == 'Windows_NT'">true</SeleniumE2ETestsSupported>
+    <EnforcePrerequisites Condition="'$(SeleniumE2ETestsSupported)' == 'true' and '$(EnforcePrerequisites)' == ''">true</EnforcePrerequisites>
 
     <!-- WebDriver is not strong-named, so this test project cannot be strong named either. -->
     <SignAssembly>false</SignAssembly>
