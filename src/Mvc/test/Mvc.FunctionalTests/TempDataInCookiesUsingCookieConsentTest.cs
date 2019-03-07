@@ -28,7 +28,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
         private static void ConfigureWebHostBuilder(IWebHostBuilder builder) =>
             builder.UseStartup<BasicWebSite.StartupWithCookieTempDataProviderAndCookieConsent>();
 
-        [Fact]
+        [Fact(Skip = "https://github.com/aspnet/AspNetCore/issues/8285")]
         public async Task CookieTempDataProviderCookie_SetInResponse_OnGrantingConsent()
         {
             // Arrange
