@@ -2,25 +2,29 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
-using Microsoft.AspNetCore.Testing.xunit;
 using Newtonsoft.Json;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Mvc.FunctionalTests
 {
-    public class JsonOutputFormatterTests : IClassFixture<MvcTestFixture<FormatterWebSite.Startup>>
+    public abstract class JsonOutputFormatterTestBase<TStartup> : IClassFixture<MvcTestFixture<TStartup>> where TStartup : class
     {
-        public JsonOutputFormatterTests(MvcTestFixture<FormatterWebSite.Startup> fixture)
+        protected JsonOutputFormatterTestBase(MvcTestFixture<TStartup> fixture)
         {
-            Client = fixture.CreateDefaultClient();
+            var factory = fixture.Factories.FirstOrDefault() ?? fixture.WithWebHostBuilder(ConfigureWebHostBuilder);
+            Client = factory.CreateDefaultClient();
         }
+
+        private static void ConfigureWebHostBuilder(IWebHostBuilder builder) =>
+            builder.UseStartup<TStartup>();
 
         public HttpClient Client { get; }
 
@@ -49,9 +53,7 @@ namespace Microsoft.AspNetCore.Mvc.FunctionalTests
             Assert.Equal(expectedBody, actualBody);
         }
 
-        [ConditionalFact]
-        // Mono issue - https://github.com/aspnet/External/issues/18
-        [FrameworkSkipCondition(RuntimeFrameworks.Mono)]
+        [Fact]
         public async Task SerializableErrorIsReturnedInExpectedFormat()
         {
             // Arrange
