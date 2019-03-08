@@ -118,16 +118,18 @@ namespace Company.WebApplication1
 #endif
 
 #if (OrganizationalAuth)
-            services.AddMvc(options =>
+            services.AddControllers(options =>
             {
                 var policy = new AuthorizationPolicyBuilder()
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             })
+            .AddRazorPages()
             .AddNewtonsoftJson();
 #else
-            services.AddMvc()
+            services.AddControllers()
+                .AddViews()
                 .AddNewtonsoftJson();
 #endif
         }
