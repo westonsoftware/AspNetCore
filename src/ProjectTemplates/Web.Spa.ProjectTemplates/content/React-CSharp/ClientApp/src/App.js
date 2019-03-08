@@ -46,4 +46,5 @@ function loginAction(name){
 function logoutAction(name) {
     return (<Logout action={name}></Logout>);
 }
+
 ////#endif
